@@ -1,0 +1,361 @@
+{
+  "real": {
+    "lip_sync": {
+      "queries": [
+        "person lip sync",
+        "person singing face",
+        "lip sync challenge person",
+        "vocal cover person face",
+        "karaoke performance person",
+        "musical lip sync face",
+        "person lip syncing to song",
+        "face lip sync video"
+      ],
+      "platforms": ["youtube"],
+      "hashtags": ["#lipsync", "#singing", "#person"],
+      "short_queries": ["person shorts lip sync", "face lip sync shorts"]
+    },
+    "dance": {
+      "queries": [
+        "person dancing face",
+        "dance challenge person",
+        "hip hop dance person",
+        "person dance video face",
+        "dance performance person",
+        "street dance person",
+        "person dancing close up",
+        "face dance video"
+      ],
+      "platforms": ["youtube"],
+      "hashtags": ["#dance", "#dancechallenge", "#person"],
+      "short_queries": ["person dance shorts", "dance face shorts"]
+    },
+    "selfie": {
+      "queries": [
+        "person selfie video face",
+        "selfie video person",
+        "person recording selfie",
+        "face selfie video",
+        "person selfie close up",
+        "selfie video with face",
+        "person talking to camera selfie"
+      ],
+      "platforms": ["youtube"],
+      "hashtags": ["#selfie", "#selfielove", "#person"],
+      "short_queries": ["person selfie shorts", "face selfie shorts"]
+    },
+    "vlog": {
+      "queries": [
+        "person vlog face",
+        "daily vlog person",
+        "person talking to camera vlog",
+        "face vlog video",
+        "vlog with person face",
+        "person daily routine face",
+        "person lifestyle vlog",
+        "person vlog close up"
+      ],
+      "platforms": ["youtube"],
+      "hashtags": ["#vlog", "#dailyvlog", "#person"],
+      "short_queries": ["person vlog shorts", "face vlog shorts"]
+    },
+    "beauty_makeup": {
+      "queries": [
+        "person makeup tutorial face",
+        "beauty tutorial person",
+        "person applying makeup face",
+        "makeup transformation person",
+        "person skincare routine face",
+        "beauty influencer person",
+        "person makeup close up",
+        "face makeup video"
+      ],
+      "platforms": ["youtube"],
+      "hashtags": ["#makeup", "#beautytutorial", "#person"],
+      "short_queries": ["person makeup shorts", "beauty face shorts"]
+    },
+    "fashion_modeling": {
+      "queries": [
+        "person fashion model face",
+        "modeling video person",
+        "person outfit of the day",
+        "fashion shoot person",
+        "person catwalk face",
+        "posing video person",
+        "person fashion influencer",
+        "face fashion video"
+      ],
+      "platforms": ["youtube"],
+      "hashtags": ["#fashion", "#modeling", "#person"],
+      "short_queries": ["person fashion shorts", "model face shorts"]
+    },
+    "fitness": {
+      "queries": [
+        "person workout face",
+        "gym workout person",
+        "person fitness routine",
+        "exercise video person",
+        "person yoga face",
+        "fitness motivation person",
+        "person home workout face",
+        "face fitness video"
+      ],
+      "platforms": ["youtube"],
+      "hashtags": ["#fitness", "#workout", "#person"],
+      "short_queries": ["person fitness shorts", "workout face shorts"]
+    },
+    "cooking": {
+      "queries": [
+        "person cooking face",
+        "cooking with chef person",
+        "person cooking tutorial",
+        "chef cooking face",
+        "person in kitchen cooking",
+        "cooking show person",
+        "person food preparation face",
+        "face cooking video"
+      ],
+      "platforms": ["youtube"],
+      "hashtags": ["#cooking", "#food", "#person"],
+      "short_queries": ["person cooking shorts", "chef face shorts"]
+    },
+    "travel": {
+      "queries": [
+        "person travel vlog face",
+        "travel video person",
+        "person exploring city",
+        "travel vlogger face",
+        "person vacation video",
+        "travel reels person",
+        "person tourist face",
+        "face travel video"
+      ],
+      "platforms": ["youtube"],
+      "hashtags": ["#travel", "#wanderlust", "#person"],
+      "short_queries": ["person travel shorts", "travel face shorts"]
+    },
+    "street_interview": {
+      "queries": [
+        "person street interview",
+        "man on the street person",
+        "street interview face",
+        "person public opinion",
+        "person street questions",
+        "city interview person",
+        "vox pop person",
+        "face street interview"
+      ],
+      "platforms": ["youtube"],
+      "hashtags": ["#streetinterview", "#voxpop", "#person"],
+      "short_queries": ["person interview shorts", "street face shorts"]
+    },
+    "podcast": {
+      "queries": [
+        "person podcast face",
+        "podcast interview person",
+        "person talking podcast",
+        "podcast guest face",
+        "person conversation podcast",
+        "podcast discussion person",
+        "talking head podcast person",
+        "face podcast video"
+      ],
+      "platforms": ["youtube"],
+      "hashtags": ["#podcast", "#podcastclips", "#person"],
+      "short_queries": ["person podcast shorts", "podcast face shorts"]
+    },
+    "reaction": {
+      "queries": [
+        "person reaction video face",
+        "reaction video person",
+        "person reacting to video",
+        "reaction face person",
+        "person emotional reaction",
+        "funny reaction person",
+        "person reacting face",
+        "face reaction video"
+      ],
+      "platforms": ["youtube"],
+      "hashtags": ["#reaction", "#react", "#person"],
+      "short_queries": ["person reaction shorts", "reaction face shorts"]
+    },
+    "singing": {
+      "queries": [
+        "person singing face",
+        "live singing person",
+        "person vocal performance",
+        "singer performing face",
+        "person song cover",
+        "live performance person",
+        "person singing close up",
+        "face singing video"
+      ],
+      "platforms": ["youtube"],
+      "hashtags": ["#singing", "#cover", "#person"],
+      "short_queries": ["person singing shorts", "singing face shorts"]
+    },
+    "comedy_skit": {
+      "queries": [
+        "person comedy skit face",
+        "funny sketch person",
+        "person comedy video",
+        "parody video person",
+        "skit comedy person",
+        "person acting funny",
+        "comedian person face",
+        "face comedy video"
+      ],
+      "platforms": ["youtube"],
+      "hashtags": ["#comedy", "#skit", "#person"],
+      "short_queries": ["person comedy shorts", "comedy face shorts"]
+    },
+    "couples_family": {
+      "queries": [
+        "couple person face",
+        "family video person",
+        "couple challenge person",
+        "family vlog person",
+        "person relationship video",
+        "family moments person",
+        "couple goals person",
+        "face family video"
+      ],
+      "platforms": ["youtube"],
+      "hashtags": ["#couple", "#family", "#person"],
+      "short_queries": ["person couple shorts", "family face shorts"]
+    },
+    "educational": {
+      "queries": [
+        "person educational video face",
+        "teacher person",
+        "person explaining face",
+        "educational content person",
+        "person teaching video",
+        "learning video person",
+        "person knowledge video",
+        "face education video"
+      ],
+      "platforms": ["youtube"],
+      "hashtags": ["#education", "#learning", "#person"],
+      "short_queries": ["person education shorts", "teacher face shorts"]
+    }
+  },
+  "fake": {
+    "face_swap": {
+      "queries": [
+        "deepfake face swap person",
+        "face swap celebrity person",
+        "AI face swap person",
+        "deepfake actor face",
+        "person face replacement AI",
+        "deepfake famous person",
+        "AI face swap video person",
+        "face swap face video"
+      ],
+      "platforms": ["youtube"],
+      "hashtags": ["#deepfake", "#faceswap", "#person"],
+      "short_queries": ["person deepfake shorts", "faceswap face shorts"]
+    },
+    "ai_talking_head": {
+      "queries": [
+        "AI generated person talking",
+        "synthetic avatar person",
+        "AI presenter person face",
+        "virtual human person",
+        "AI spokesperson person",
+        "digital person face",
+        "virtual influencer person",
+        "AI avatar face"
+      ],
+      "platforms": ["youtube"],
+      "hashtags": ["#aitalkinghead", "#syntheticmedia", "#person"],
+      "short_queries": ["person AI shorts", "avatar face shorts"]
+    },
+    "lip_sync_deepfake": {
+      "queries": [
+        "deepfake lip sync person",
+        "AI lip sync person",
+        "person lip sync deepfake",
+        "AI dubbing person",
+        "deepfake dialogue person",
+        "synchronized lip person",
+        "person AI lip sync",
+        "lip sync face deepfake"
+      ],
+      "platforms": ["youtube"],
+      "hashtags": ["#lipsyncai", "#deepfakevoice", "#person"],
+      "short_queries": ["person lipsync shorts", "deepfake face shorts"]
+    },
+    "identity_swap": {
+      "queries": [
+        "identity swap person",
+        "face swap identity person",
+        "deepfake identity change person",
+        "AI identity replacement person",
+        "person identity swap",
+        "AI face identity person"
+      ],
+      "platforms": ["youtube"],
+      "hashtags": ["#identityswap", "#aiidentity", "#person"],
+      "short_queries": ["person identity shorts", "identity face shorts"]
+    },
+    "expression_reenactment": {
+      "queries": [
+        "expression transfer person",
+        "face reenactment person",
+        "deepfake expression person",
+        "AI expression change person",
+        "person facial reenactment",
+        "expression face AI"
+      ],
+      "platforms": ["youtube"],
+      "hashtags": ["#expressiontransfer", "#facereenactment", "#person"],
+      "short_queries": ["person expression shorts", "expression face shorts"]
+    },
+    "ai_avatar": {
+      "queries": [
+        "AI avatar person",
+        "virtual influencer person",
+        "AI generated avatar person",
+        "metaverse avatar person",
+        "digital human person",
+        "AI character person",
+        "person AI avatar",
+        "avatar face video"
+      ],
+      "platforms": ["youtube"],
+      "hashtags": ["#aiavatar", "#virtualinfluencer", "#person"],
+      "short_queries": ["person avatar shorts", "AI face shorts"]
+    },
+    "voice_cloned": {
+      "queries": [
+        "voice clone person",
+        "AI voice cloning person",
+        "deepfake voice person",
+        "synthesized voice person",
+        "person AI voiceover",
+        "voice swap person",
+        "AI voice face person",
+        "voice clone face video"
+      ],
+      "platforms": ["youtube"],
+      "hashtags": ["#voiceclone", "#aispeech", "#person"],
+      "short_queries": ["person voice shorts", "voice face shorts"]
+    },
+    "multi_face_ai": {
+      "queries": [
+        "multi face swap people",
+        "group deepfake people",
+        "AI multiple faces people",
+        "deepfake group people",
+        "people face swap AI",
+        "group AI face video",
+        "multiple person deepfake",
+        "group face swap"
+      ],
+      "platforms": ["youtube"],
+      "hashtags": ["#multifaceswap", "#groupdeepfake", "#people"],
+      "short_queries": ["people deepfake shorts", "group face shorts"]
+    }
+  }
+}
