@@ -164,14 +164,24 @@ YouTube   → cookies/youtube_cookies.txt
 
 > **Security Warning:** Browser cookies can contain active login-session information. Treat these files like passwords. Only export cookies from accounts you own or are authorized to use. Never share them, upload them publicly, commit them to GitHub, or send them to anyone else.
 
-### 6. Configure Your Search Queries
+### 6. Configure Categories and Search Queries
 
-All categories and search queries are defined in **`categories.json`** — a single
-file used by both the automated bot (`main.py`) and the bulk upload GUI
-(`bulk_upload_gui.py`). You do **not** need to edit any Python code to customize
-the content the bot collects.
+All categories and their search queries are defined in **`categories.json`** — a
+single configuration file shared by the automated bot (`main.py`) and the bulk
+upload GUI (`bulk_upload_gui.py`). You do **not** need to edit any Python code
+to customize the content the bot collects.
 
-The file is organized into two groups — `real` and `fake`:
+The file is organized into two groups — `real` and `fake`. Each category
+supports the following fields:
+
+| Field           | Purpose                                                                   |
+| --------------- | ------------------------------------------------------------------------- |
+| `queries`       | Search terms used by the automated bot. One query is picked at random per category for each batch. |
+| `hashtags`      | The bot occasionally appends one of these to the selected query.          |
+| `platforms`     | Reserved for future use — the bot currently searches **YouTube** only.    |
+| `short_queries` | Reserved for future use — not used by the bot yet.                        |
+
+Example:
 
 ```json
 {
@@ -195,10 +205,20 @@ The file is organized into two groups — `real` and `fake`:
 ```
 
 * **Add a category:** copy an existing category and give it a new key (e.g. `"gaming"`).
-  It will automatically appear in the GUI's category dropdown and be used for bot searches.
-* **Edit queries:** change the `queries` list to match the type of videos you want
-  the bot to find, download, and upload to Google Drive.
+  It will automatically appear in the GUI's category dropdown and be used by the
+  automated bot for searches.
+* **Edit search queries:** change the `queries` list (and optionally `hashtags`)
+  to match the type of videos you want the bot to find, download, and upload to
+  Google Drive. If a query does not already contain the words "person" or "face",
+  the bot appends them automatically.
 * **Remove a category:** delete its entry from `categories.json`.
+
+#### Categories in the Bulk Upload GUI
+
+The GUI (`bulk_upload_gui.py`) does **not** run searches — you paste video links
+manually. It loads the category **names** from `categories.json` to populate its
+category dropdown, filtering by the selected label (`real` or `fake`). The field
+is editable, so you can also type a custom category name.
 
 > **Note:** Do not rely solely on the search results. Automated search can make
 > mistakes. Thoroughly review the downloaded videos to ensure they match your
