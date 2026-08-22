@@ -1,6 +1,6 @@
-# ClipFlow: Download Videos from Facebook, TikTok, and YouTube & Upload to Google Drive
+# CrawlFlow: Download Videos from Facebook, TikTok, and YouTube & Upload to Google Drive
 
-ClipFlow is a simple bot for downloading videos from **Facebook, TikTok, and YouTube** based on your configured search queries and uploading the downloaded videos to a selected Google Drive folder.
+CrawlFlow is a simple bot for downloading videos from **Facebook, TikTok, and YouTube** based on your configured search queries and uploading the downloaded videos to a selected Google Drive folder.
 
 > **Important:** Search results are not guaranteed to be perfect. The bot may occasionally download videos that do not exactly match your intended query. Always review the downloaded videos and perform manual verification when necessary.
 
@@ -295,7 +295,7 @@ Good luck, and enjoy!
 
 ## Research & Legal Notice
 
-ClipFlow was developed primarily for academic and educational research,
+CrawlFlow was developed primarily for academic and educational research,
 particularly for collecting social-media video samples for research into
 AI-generated content and deepfake detection.
 
@@ -303,11 +303,11 @@ The tool is intended to assist researchers in organizing and collecting
 content that they are legally permitted to access and use for their
 research.
 
-Users are responsible for ensuring that their use of ClipFlow complies with
+Users are responsible for ensuring that their use of CrawlFlow complies with
 applicable laws, copyright requirements, privacy requirements, and the Terms
 of Service of the platforms they access.
 
-ClipFlow does not grant users any rights to third-party content. Users should
+CrawlFlow does not grant users any rights to third-party content. Users should
 not download, reproduce, redistribute, or otherwise use content unless they
 have the necessary rights, permission, or other lawful basis to do so.
 
@@ -315,7 +315,7 @@ For research datasets, users should maintain appropriate source information
 and attribution where required and should avoid publicly redistributing
 copyrighted media collected from third-party platforms.
 
-The developers of ClipFlow do not encourage copyright infringement,
+The developers of CrawlFlow do not encourage copyright infringement,
 unauthorized access, or violation of third-party platform policies.
 
 ---
