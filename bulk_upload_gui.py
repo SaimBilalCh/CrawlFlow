@@ -10,6 +10,7 @@ import tkinter as tk
 from tkinter import ttk, scrolledtext, messagebox, filedialog
 import yt_dlp
 import hashlib
+from PIL import Image, ImageTk
 
 # Import your existing modules
 from config import CONFIG
@@ -51,19 +52,35 @@ class BulkUploadGUI:
         # === TOP: Title ===
         title_frame = ttk.Frame(main_frame)
         title_frame.pack(fill=tk.X, pady=(0, 10))
-        
+
+        # Load and resize logo
+        logo = Image.open("images/Logo.png")
+
+        # Set desired width and height
+        logo = logo.resize((35, 35))
+
+        # Convert to Tkinter image
+        self.logo_image = ImageTk.PhotoImage(logo)
+
+        # Logo + title
         title_label = ttk.Label(
-            title_frame, 
-            text="📹 Bulk Video Upload Tool", 
+            title_frame,
+            image=self.logo_image,
+            text="CrawlFlow",
+            compound="left",  # Image on left, text on right
             font=('Arial', 18, 'bold')
         )
+
+        # Center the whole logo + text combination
         title_label.pack()
-        
+
         subtitle_label = ttk.Label(
             title_frame,
             text="YouTube • TikTok • Facebook  |  Download & Upload to Google Drive",
             font=('Arial', 10)
         )
+
+        subtitle_label.pack()
         subtitle_label.pack()
         
         # === ROW 1: Label & Category Selection ===

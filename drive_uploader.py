@@ -15,7 +15,12 @@ from googleapiclient.errors import HttpError
 class DriveUploader:
     def __init__(self, config):
         self.config = config
-        self.folder_id = config["DRIVE_FOLDER_ID"]
+        self.folder_id = config.get("DRIVE_FOLDER_ID")
+        if not self.folder_id:
+            raise ValueError(
+                "DRIVE_FOLDER_ID is missing. Add the Google Drive folder ID "
+                "to the project-root .env file."
+            )
         self.service = None
         self.real_folder_id = None
         self.fake_folder_id = None
