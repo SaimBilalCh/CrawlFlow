@@ -1,5 +1,58 @@
 # CrawlFlow: Download Videos from Facebook, TikTok, and YouTube & Upload to Google Drive
 
+## Control panel (recommended)
+
+CrawlFlow ships with a built-in web control panel — no Node.js, no extra
+processes. Start it with:
+
+```bash
+run_web.bat
+```
+
+or manually:
+
+```bash
+venv\Scripts\python -m uvicorn app.web_api:app --host 127.0.0.1 --port 8765
+```
+
+Then open [http://127.0.0.1:8765](http://127.0.0.1:8765).
+
+The panel covers every normal workflow:
+
+- **First-time setup wizard** — appears only until Google Drive is configured
+  and validated (OAuth client upload, Google sign-in, Drive folder ID + live
+  connection test). Never shown again once setup is complete.
+- **Dashboard** — live stats (processed / successful / failed / queued / Drive
+  videos), quick actions, recent activity.
+- **Upload Links** — bulk tab (paste links one per line or load a `.txt`,
+  review, remove individual links, confirm) and single-link tab. Both feed the
+  same background processing engine; progress, errors, and per-link retry
+  survive page refreshes and app restarts (`logs/jobs.json`).
+- **Recent Drive Uploads** — newest files/folders in your Drive location,
+  with source URL and direct Drive links.
+- **Activity History** — filterable record of every processed link.
+- **Settings** — Drive credentials/authorization state, folder ID with test
+  connection, engine targets/batch size (persisted to `.env`).
+
+Only link uploads, settings, and Drive inspection are needed from the browser.
+The API binds to 127.0.0.1 only and rejects non-local connections.
+
+### First-time setup walkthrough
+
+1. Put `credentials/credentials.json` (Google OAuth *Desktop app* client) in
+   `CrawlFlow-bot/credentials/` — or upload it in the wizard.
+2. Open the panel; the setup wizard shows automatically. Step 1: upload the
+   OAuth client if missing. Step 2: click *Connect* and approve the Google
+   window on this machine, then paste your Drive folder ID and test it.
+   Step 3: *Finish setup* (validated with a live Drive API call).
+3. Next visits go straight to the dashboard.
+
+## Legacy CLI / GUI usage (unchanged)
+
+All Python modules live in the **`app/`** package. The original terminal bot
+(`app/main.py`), Tkinter bulk tool (`app/bulk_upload_gui.py`),
+and scheduled collection still work exactly as before — see the sections below.
+
 CrawlFlow is a simple bot for downloading videos from **Facebook, TikTok, and YouTube** based on your configured search queries and uploading the downloaded videos to a selected Google Drive folder.
 
 > **Important:** Search results are not guaranteed to be perfect. The bot may occasionally download videos that do not exactly match your intended query. Always review the downloaded videos and perform manual verification when necessary.
@@ -166,9 +219,9 @@ YouTube   → cookies/youtube_cookies.txt
 
 ### 6. Configure Categories and Search Queries
 
-All categories and their search queries are defined in **`categories.json`** — a
-single configuration file shared by the automated bot (`main.py`) and the bulk
-upload GUI (`bulk_upload_gui.py`). You do **not** need to edit any Python code
+All categories and their search queries are defined in **`app/categories.json`** — a
+single configuration file shared by the automated bot (`app/main.py`) and the bulk
+upload GUI (`app/bulk_upload_gui.py`). You do **not** need to edit any Python code
 to customize the content the bot collects.
 
 The file is organized into two groups — `real` and `fake`. Each category

@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CrawlFlow Control Panel</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div id="app" class="app-shell">
+    <!-- Sidebar (hidden during first-time setup) -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand">
+        <img src="/logo.png" alt="" class="brand-logo" onerror="this.style.display='none'">
+        <span class="brand-name">Crawl<em>Flow</em></span>
+      </div>
+      <nav class="sidebar-nav" id="nav"></nav>
+      <div class="sidebar-footer">
+        <div class="side-status" id="side-status"></div>
+      </div>
+    </aside>
+    <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+
+    <!-- Main content -->
+    <main class="main">
+      <button class="hamburger" id="hamburger" aria-label="Toggle navigation">☰</button>
+      <div id="view" class="view"></div>
+    </main>
+  </div>
+
+  <div id="toasts" class="toasts"></div>
+  <div id="modal-root"></div>
+
+  <script src="/app.js"></script>
+</body>
+</html>

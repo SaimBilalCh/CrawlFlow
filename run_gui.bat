@@ -1,4 +1,6 @@
 @echo off
+REM Starts the legacy Tkinter bulk upload tool
+cd /d "%~dp0"
 echo Starting Bulk Upload GUI...
-python bulk_upload_gui.py
+venv\Scripts\python.exe app\bulk_upload_gui.py
 pause

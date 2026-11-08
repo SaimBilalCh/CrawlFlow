@@ -4,13 +4,14 @@ from dotenv import load_dotenv
 import os
 from pathlib import Path
 
-load_dotenv(Path(__file__).resolve().parent / ".env")
+# .env lives in the project root (this file is inside app/)
+load_dotenv(Path(__file__).resolve().parent.parent / ".env")
 
 CONFIG = {
-    # === COLLECTION TARGETS ===
-    "TARGET_REAL": 1000,
-    "TARGET_FAKE": 1000,
-    "BATCH_SIZE": 25,  # Videos per batch run
+    # === COLLECTION TARGETS === (persisted in .env as CRAWLFLOW_* overrides)
+    "TARGET_REAL": int(os.getenv("CRAWLFLOW_TARGET_REAL", "1000")),
+    "TARGET_FAKE": int(os.getenv("CRAWLFLOW_TARGET_FAKE", "1000")),
+    "BATCH_SIZE": int(os.getenv("CRAWLFLOW_BATCH_SIZE", "25")),  # Videos per batch run
     
     # === ACCEPTANCE CRITERIA ===
    "ACCEPTANCE": {

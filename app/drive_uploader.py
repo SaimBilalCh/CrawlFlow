@@ -1,10 +1,21 @@
 # drive_uploader.py - ULTIMATE RELIABLE VERSION
 
 import os
+import sys
+import codecs
 import json
 import time
 import mimetypes
 from pathlib import Path
+
+# Emoji prints crash on Windows cp1252 consoles; force UTF-8 like main.py does.
+try:
+    if getattr(sys.stdout, "encoding", "utf-8").lower() not in ("utf-8", "utf8"):
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    if getattr(sys.stderr, "encoding", "utf-8").lower() not in ("utf-8", "utf8"):
+        sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+except AttributeError:
+    pass  # non-reconfigurable stream (rare); console output may degrade instead of crash
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
@@ -188,9 +199,12 @@ class DriveUploader:
                 video_metadata = {
                     'name': file_name,
                     'parents': [parent_folder],
-                    'description': json.dumps({
+                    'description': json.dumps({k: v for k, v in {
                         'label': label,
                         'category': category,
+                        'original_url': metadata.get('original_url'),
+                        'source_title': metadata.get('source_title'),
+                        'platform': metadata.get('platform'),
                         'duration': metadata.get('duration', 0),
                         'resolution': metadata.get('resolution', 'unknown'),
                         'fps': metadata.get('fps', 0),
@@ -198,7 +212,7 @@ class DriveUploader:
                         'quality_score': metadata.get('quality_score', 0),
                         'download_date': metadata.get('download_timestamp', ''),
                         'upload_attempt': attempt + 1
-                    }, indent=2)
+                    }.items() if v is not None})
                 }
                 
                 # Use resumable media for large files

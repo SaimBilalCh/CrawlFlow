@@ -6,6 +6,7 @@ import json
 import random
 import time
 import logging
+import threading
 from pathlib import Path
 from datetime import datetime
 import schedule
@@ -19,10 +20,12 @@ from metadata_extractor import MetadataExtractor
 from drive_uploader import DriveUploader
 
 # Setup logging
-import codecs
-if sys.stdout.encoding != 'utf-8':
-    sys.stdout = codecs.getwriter('utf-8')(sys.stdout.buffer, 'strict')
-    sys.stderr = codecs.getwriter('utf-8')(sys.stderr.buffer, 'strict')
+if getattr(sys.stdout, "encoding", "utf-8").lower() not in ("utf-8", "utf8"):
+    try:
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+        sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+    except AttributeError:
+        pass  # non-reconfigurable stream (rare); console output may degrade instead of crash
 
 logging.basicConfig(
     level=logging.INFO,
@@ -52,6 +55,7 @@ class DeepfakeCollector:
         # Initialize counters
         self.real_count = len(self.progress.get("real", []))
         self.fake_count = len(self.progress.get("fake", []))
+        self._collector_lock = threading.Lock()
         
         logger.info(">>> Starting Deepfake Collector")
         logger.info(f"Current: {self.real_count} real, {self.fake_count} fake")
@@ -226,8 +230,12 @@ class DeepfakeCollector:
     
     def process_category(self, category_name, category_type):
         """Process one category"""
+        with self._collector_lock:
+            return self._process_category(category_name, category_type)
+
+    def _process_category(self, category_name, category_type):
         # Check if we've reached target
-        target = CONFIG["TARGET_REAL"] if category_type == "real" else CONFIG["TARGET_FAKE"]
+        target = self.config["TARGET_REAL"] if category_type == "real" else self.config["TARGET_FAKE"]
         current_count = len(self.progress.get(category_type, []))
         
         if current_count >= target:
@@ -257,13 +265,16 @@ class DeepfakeCollector:
         logger.info(f"Searching: '{query}' on {platform} ({category_type}/{category_name})")
         
         # Search for videos
-        filtered_videos = self.search_and_filter_videos(query, platform, CONFIG["BATCH_SIZE"])
+        filtered_videos = self.search_and_filter_videos(query, platform, self.config["BATCH_SIZE"])
         
         if not filtered_videos:
             logger.warning(f"No videos found for {category_name}")
             return
         
         # Download videos
+        download_path = Path(self.config["PATHS"]["download"])
+        download_path.mkdir(parents=True, exist_ok=True)
+        existing_files = set(download_path.glob("*.mp4"))
         downloaded = self.download_filtered_videos(filtered_videos, platform)
         
         if not downloaded:
@@ -272,8 +283,7 @@ class DeepfakeCollector:
         
         # Process each downloaded video
         accepted_count = 0
-        download_path = Path(CONFIG["PATHS"]["download"])
-        video_files = list(download_path.glob("*.mp4"))
+        video_files = [path for path in download_path.glob("*.mp4") if path not in existing_files]
         
         logger.info(f"📁 Found {len(video_files)} video files in downloads folder")
         
