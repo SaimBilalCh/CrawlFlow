@@ -75,6 +75,10 @@ const fmtTime = (iso) => { try { return new Date(iso).toLocaleString(); } catch 
 function statusBadge(status) {
   return h("span", { class: `badge ${status}`, text: { pending: "Pending", processing: "Processing", completed: "Completed", failed: "Failed", cancelled: "Cancelled" }[status] || status });
 }
+const icon = {
+  file: '<span class="fx-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#3b6ee0" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg></span>',
+  folder: '<span class="fx-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#d97706" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg></span>',
+};
 function errorBanner(message) {
   return h("div", { class: "error-banner" }, h("span", { html: "⚠️" }), h("span", { text: message }));
 }
@@ -114,6 +118,7 @@ async function loadCategories() {
 /* ---------- sidebar ---------- */
 const NAV_ITEMS = [
   { id: "dashboard", label: "Dashboard" },
+  { id: "collector", label: "Auto Collector" },
   { id: "uploads", label: "Upload Links" },
   { id: "drive", label: "Recent Drive Uploads" },
   { id: "history", label: "Activity History" },
@@ -156,7 +161,7 @@ function field(labelText, inputEl, required) {
 /* =================================================================== */
 /* Router                                                               */
 /* =================================================================== */
-const routes = { dashboard: viewDashboard, uploads: viewUploads, drive: viewDrive, history: viewHistory, settings: viewSettings, setup: viewSetup };
+const routes = { dashboard: viewDashboard, collector: viewCollector, uploads: viewUploads, drive: viewDrive, history: viewHistory, settings: viewSettings, setup: viewSetup };
 
 async function navigate() {
   stopPoll();
@@ -194,6 +199,7 @@ async function viewDashboard() {
   const quick = h("div", { class: "stats", style: "grid-template-columns:repeat(auto-fill,minmax(180px,1fr));margin-top:16px;" },
     h("button", { class: "btn", text: "＋ Upload a single link", onclick: () => { sessionStorage.setItem("cf-open-single", "1"); location.hash = "#/uploads"; } }),
     h("button", { class: "btn secondary", text: "⇪ Bulk upload links", onclick: () => { location.hash = "#/uploads"; } }),
+    h("button", { class: "btn secondary", text: "⏱ Auto-collect session", onclick: () => { location.hash = "#/collector"; } }),
     h("button", { class: "btn secondary", text: "☁ Recent Drive uploads", onclick: () => { location.hash = "#/drive"; } }),
     h("button", { class: "btn secondary", text: "⚙ Open settings", onclick: () => { location.hash = "#/settings"; } }));
 
@@ -242,6 +248,127 @@ function statTile(row, label, value, foot, cls) {
     h("div", { class: "label", text: label }),
     h("div", { class: "value", text: value }),
     h("div", { class: "foot", text: foot })));
+}
+
+/* =================================================================== */
+/* Auto Collector — timed session around DeepfakeCollector              */
+/* =================================================================== */
+async function viewCollector() {
+  const view = document.getElementById("view");
+  view.append(pageHead("Auto Collector",
+    "Turn the collector loose: it cycles through every configured category using the stored search queries, downloads videos, quality-checks them (blur + face detection), and uploads the accepted ones to Drive — for one timed session."));
+
+  const card = h("div", { class: "card card-pad" });
+  const logCard = h("div", { class: "card" },
+    h("div", { class: "card-head" }, h("div", null,
+      h("h2", { text: "Collector log" }),
+      h("p", { class: "hint", text: "Tail of logs/collection.log" }))));
+  view.append(card, logCard);
+
+  let st = null;
+  let countdownTimer = null;
+
+  function fmtRemaining(ms) {
+    const s = Math.max(0, Math.round(ms / 1000));
+    return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
+  }
+
+  async function refresh() {
+    try { st = await api("/api/collector/status"); }
+    catch (error) { card.textContent = ""; card.append(errorBanner(error.message)); return; }
+    render();
+  }
+
+  function render() {
+    if (countdownTimer) { clearInterval(countdownTimer); countdownTimer = null; }
+    card.textContent = "";
+    const s = st || {};
+    const session = s.session || { status: "idle" };
+    const running = s.running;
+    const deadline = session.deadline_at ? new Date(session.deadline_at) : null;
+
+    const head = h("div", { class: "row", style: "margin-bottom:12px;" },
+      h("h2", { text: running ? "Session running" : "Session idle" }),
+      running ? h("span", { class: "badge processing", id: "collect-countdown", text: "—" }) : null);
+    card.append(head);
+
+    if (running) {
+      if (deadline) {
+        const tick = () => {
+          const badge = document.getElementById("collect-countdown");
+          if (badge) badge.textContent = `${fmtRemaining(deadline - Date.now())} remaining`;
+        };
+        tick();
+        countdownTimer = setInterval(tick, 1000);
+      }
+      if (session.current) {
+        card.append(h("p", { style: "margin-top:4px;" },
+          "Currently fetching: ",
+          h("strong", { text: `${session.current.label === "real" ? "Real video" : "AI generated (fake)"} · ${session.current.category.replaceAll("_", " ")}` })));
+      }
+      card.append(h("div", { class: "row", style: "margin-top:14px;" },
+        h("button", {
+          class: "btn danger", text: "■ Stop session",
+          onclick: async () => {
+            const ok = await confirmDialog({
+              title: "Stop the auto-collection session?",
+              bodyNode: h("p", null, "The collector loses up to one in-progress video download. Already-uploaded videos stay in Drive. Link uploads become available again right away."),
+              confirmLabel: "Stop session", danger: true,
+            });
+            if (!ok) return;
+            try { await api("/api/collector/stop", { method: "POST" }); toast("Stop signal sent — the session ends after the current step.", "info"); }
+            catch (error) { toast(error.message, "error"); }
+            refresh();
+          },
+        })));
+    } else {
+      const last = session.status !== "idle" ? session : null;
+      if (last) {
+        const labelFor = { finished: "Finished", stopped: "Stopped", interrupted: "Interrupted by restart" };
+        card.append(last.reason
+          ? h("p", { class: "muted", style: "margin-top:4px;", text: `Last session: ${labelFor[last.status] || last.status} — ${last.reason}${last.error ? ` (${last.error})` : ""}` })
+          : h("p", { class: "muted", style: "margin-top:4px;", text: `Last session: ${labelFor[last.status] || last.status}.` }));
+        card.append(h("div", { class: "row", style: "margin-top:8px;" },
+          h("span", { class: "badge completed", text: `Collected ${last.gained?.real ?? 0} real` }),
+          h("span", { class: "badge completed", text: `Collected ${last.gained?.fake ?? 0} fake` })));
+      } else {
+        card.append(h("p", { class: "muted", style: "margin-top:4px;", text: "No session run yet." }));
+      }
+      card.append(h("div", { class: "row", style: "margin-top:16px;" },
+        h("button", {
+          class: "btn", text: `▶ Start session (${s.run_minutes ?? 60} min)`, disabled: s.queue_active,
+          onclick: async () => {
+            const ok = await confirmDialog({
+              title: "Start auto-collection?",
+              bodyNode: h("div", null,
+                h("p", null, `The collector will cycle through all configured categories for about ${s.run_minutes ?? 60} minutes, fetching videos per your search queries and uploading accepted ones to Drive.`),
+                h("p", { class: "muted", style: "margin-top:6px;", text: "While it runs, link uploads from the panel are paused. You can stop the session at any time." })),
+              confirmLabel: "Start session",
+            });
+            if (!ok) return;
+            try { await api("/api/collector/start", { method: "POST" }); toast("Auto-collection started.", "success"); }
+            catch (error) { toast(error.message, "error"); }
+            refresh();
+          },
+        }),
+        s.queue_active ? h("span", { class: "muted", text: "Waiting for the link queue to finish first." }) : null));
+    }
+
+    const totals = session.totals || { real: 0, fake: 0 };
+    card.append(h("div", { class: "stats", style: "margin-top:18px;" },
+      h("div", { class: "stat" }, h("div", { class: "label", text: "Real videos (all-time)" }), h("div", { class: "value", text: String(totals.real) }), h("div", { class: "foot", text: running ? `+${session.gained?.real ?? 0} this session` : "in Drive" })),
+      h("div", { class: "stat" }, h("div", { class: "label", text: "Fake videos (all-time)" }), h("div", { class: "value", text: String(totals.fake) }), h("div", { class: "foot", text: running ? `+${session.gained?.fake ?? 0} this session` : "in Drive" }))));
+
+    const logList = null;
+    if (logCard.children[1]) logCard.children[1].textContent = "";
+    const pad = h("div", { class: "card-pad" });
+    pad.append(h("pre", { class: "mono", style: "max-height:260px;overflow-y:auto;white-space:pre-wrap;margin:0;white-space:pre-wrap;" },
+      (s.logs || []).length ? s.logs.join("\n") : "No log lines yet."));
+    logCard.append(pad);
+    poll(refresh, running ? 2000 : 6000);
+  }
+
+  await refresh();
 }
 
 /* =================================================================== */
@@ -811,11 +938,13 @@ async function viewSettings() {
   const batchSize = h("input", { type: "number", min: "1", max: "100", value: String(settings.crawler.batch_size) });
   const targetReal = h("input", { type: "number", min: "1", value: String(settings.crawler.target_real) });
   const targetFake = h("input", { type: "number", min: "1", value: String(settings.crawler.target_fake) });
+  const runMinutes = h("input", { type: "number", min: "1", max: "480", value: String(settings.crawler.run_minutes ?? 60) });
   const saveCrawlBtn = h("button", { class: "btn", text: "Save engine settings", onclick: async () => {
     saveCrawlBtn.disabled = true;
     try {
       await postJSON("/api/settings", {
         batch_size: Number(batchSize.value), target_real: Number(targetReal.value), target_fake: Number(targetFake.value),
+        run_minutes: Number(runMinutes.value),
       });
       toast("Engine settings saved.", "success");
     } catch (error) { toast(`Save failed: ${error.message}`, "error"); }
@@ -825,7 +954,8 @@ async function viewSettings() {
     h("div", { class: "form-row" },
       field("Batch size (videos per scheduled run)", batchSize, true),
       field("Target: real videos", targetReal, true),
-      field("Target: fake videos", targetFake, true)),
+      field("Target: fake videos", targetFake, true),
+      field("Auto-collect session length (minutes)", runMinutes, true)),
     h("div", { class: "muted", text: "Platforms in use: " + Object.entries(settings.platforms).map(([name, cfg]) => `${name} (${cfg.enabled ? "enabled" : "disabled"})`).join(", ") + ". Cookies are read from the cookies/ folder." }),
     h("div", { class: "row", style: "margin-top:14px;" }, saveCrawlBtn)));
 

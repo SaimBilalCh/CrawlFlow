@@ -27,6 +27,7 @@ os.chdir(ROOT)
 load_dotenv(ROOT / ".env")
 
 from config import CONFIG  # noqa: E402
+from run_manager import session as collector_session  # noqa: E402
 from search_queries import FAKE_CATEGORIES, REAL_CATEGORIES  # noqa: E402
 
 LOG_PATH = ROOT / "logs" / "collection.log"
@@ -67,6 +68,41 @@ async def local_only(request, call_next):
     if host not in {"127.0.0.1", "::1", "localhost", "testclient"}:
         return JSONResponse({"detail": "The collector API only accepts local connections."}, status_code=403)
     return await call_next(request)
+
+
+# ===================== Auto collector sessions =====================
+
+
+@app.get("/api/collector/status")
+def collector_status() -> dict:
+    proc = read_jobs()
+    stats = proc.stats()
+    return {
+        "running": collector_session.is_running(),
+        "session": collector_session.status(),
+        "run_minutes": CONFIG["RUN_MINUTES"],
+        "logs": read_logs(15),
+        "queue_active": (stats.get("pending", 0) + stats.get("processing", 0)) > 0,
+    }
+
+
+@app.post("/api/collector/start")
+def collector_start() -> dict:
+    stats = read_jobs().stats()
+    active_jobs = stats.get("pending", 0) + stats.get("processing", 0)
+    if active_jobs:
+        raise HTTPException(status_code=409, detail="Link processing queue is active. Wait for it to finish or cancel pending jobs before starting an auto-collection session.")
+    started = collector_session.start()
+    if started is None:
+        raise HTTPException(status_code=409, detail="An auto-collection session is already running.")
+    return {"accepted": True, "session": started}
+
+
+@app.post("/api/collector/stop")
+def collector_stop() -> dict:
+    if not collector_session.stop():
+        raise HTTPException(status_code=404, detail="No active auto-collection session.")
+    return {"accepted": True}
 
 
 class RunRequest(BaseModel):
@@ -229,6 +265,8 @@ def create_jobs(request: JobRequest) -> dict:
     accepting = bool((ROOT / "credentials" / "token.json").is_file() and CONFIG.get("DRIVE_FOLDER_ID"))
     if not accepting:
         raise HTTPException(status_code=400, detail="Complete first-time setup before uploading links.")
+    if collector_session.is_running():
+        raise HTTPException(status_code=409, detail="An auto-collection session is running. Stop it before uploading links.")
     accepted, rejected = proc.submit([u.strip() for u in request.urls if u.strip()], request.label, request.category)
     return {"accepted": accepted, "rejected": rejected}
 
@@ -239,6 +277,8 @@ async def upload_links_file(label: Literal["real", "fake"], category: str, file:
     categories = REAL_CATEGORIES if label == "real" else FAKE_CATEGORIES
     if category not in categories:
         raise HTTPException(status_code=400, detail="Choose a category from the list.")
+    if collector_session.is_running():
+        raise HTTPException(status_code=409, detail="An auto-collection session is running. Stop it before uploading links.")
     if (file.filename or "").lower().endswith(".txt") is False:
         raise HTTPException(status_code=400, detail="Only .txt files are accepted.")
     data = await file.read()
@@ -394,7 +434,7 @@ def drive_auth_start() -> dict:
 # ===================== Settings & first-run setup =====================
 
 
-EDITABLE_CONFIG_KEYS = ["DRIVE_FOLDER_ID", "CRAWLFLOW_BATCH_SIZE", "CRAWLFLOW_TARGET_REAL", "CRAWLFLOW_TARGET_FAKE"]
+EDITABLE_CONFIG_KEYS = ["DRIVE_FOLDER_ID", "CRAWLFLOW_BATCH_SIZE", "CRAWLFLOW_TARGET_REAL", "CRAWLFLOW_TARGET_FAKE", "CRAWLFLOW_RUN_MINUTES"]
 
 
 def read_env_file() -> list[str]:
@@ -430,6 +470,7 @@ def get_settings() -> dict:
             "batch_size": CONFIG["BATCH_SIZE"],
             "target_real": CONFIG["TARGET_REAL"],
             "target_fake": CONFIG["TARGET_FAKE"],
+            "run_minutes": CONFIG["RUN_MINUTES"],
         },
         "platforms": CONFIG["PLATFORMS"],
         "env_keys_present": {key: key in env for key in EDITABLE_CONFIG_KEYS},
@@ -441,6 +482,7 @@ class SettingsRequest(BaseModel):
     batch_size: int | None = Field(default=None, ge=1, le=100)
     target_real: int | None = Field(default=None, ge=1, le=100000)
     target_fake: int | None = Field(default=None, ge=1, le=100000)
+    run_minutes: int | None = Field(default=None, ge=1, le=480)
 
 
 @app.post("/api/settings")
@@ -461,6 +503,9 @@ def save_settings(request: SettingsRequest) -> dict:
     if request.target_fake is not None:
         updates["CRAWLFLOW_TARGET_FAKE"] = str(request.target_fake)
         CONFIG["TARGET_FAKE"] = request.target_fake
+    if request.run_minutes is not None:
+        updates["CRAWLFLOW_RUN_MINUTES"] = str(request.run_minutes)
+        CONFIG["RUN_MINUTES"] = request.run_minutes
 
     if updates:
         lines = read_env_file()

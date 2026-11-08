@@ -5,5 +5,7 @@ credentials/
 cookies/
 metadata/
 logs/
+downloads/
+temp_*.json
 
 .env

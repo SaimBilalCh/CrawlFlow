@@ -24,6 +24,13 @@ The panel covers every normal workflow:
   connection test). Never shown again once setup is complete.
 - **Dashboard** — live stats (processed / successful / failed / queued / Drive
   videos), quick actions, recent activity.
+- **Auto Collector** — start a timed auto-collection session (default 60 min,
+  configurable in Settings as `CRAWLFLOW_RUN_MINUTES`). The collector cycles
+  through every configured real/fake category using its search queries,
+  downloads videos, quality-checks them (blur + face detection), and uploads
+  accepted ones to Drive. Stop button aborts mid-download; link uploads from
+  the panel are paused while a session runs; state survives refreshes and
+  restarts (`logs/collector_session.json`).
 - **Upload Links** — bulk tab (paste links one per line or load a `.txt`,
   review, remove individual links, confirm) and single-link tab. Both feed the
   same background processing engine; progress, errors, and per-link retry

@@ -12,6 +12,7 @@ CONFIG = {
     "TARGET_REAL": int(os.getenv("CRAWLFLOW_TARGET_REAL", "1000")),
     "TARGET_FAKE": int(os.getenv("CRAWLFLOW_TARGET_FAKE", "1000")),
     "BATCH_SIZE": int(os.getenv("CRAWLFLOW_BATCH_SIZE", "25")),  # Videos per batch run
+    "RUN_MINUTES": int(os.getenv("CRAWLFLOW_RUN_MINUTES", "60")),  # Auto-collect session length (minutes)
     
     # === ACCEPTANCE CRITERIA ===
    "ACCEPTANCE": {

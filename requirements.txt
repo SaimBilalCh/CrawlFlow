@@ -1,5 +1,5 @@
 yt-dlp>=2023.10.13
-opencv-python>=4.8.0
+opencv-python>=4.8.0,<5  # 5.x removed CascadeClassifier, quality_checker needs it
 numpy>=1.24.0
 google-api-python-client>=2.100.0
 google-auth-oauthlib>=1.0.0

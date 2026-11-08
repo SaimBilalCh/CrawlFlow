@@ -189,7 +189,7 @@ class DeepfakeCollector:
             logger.warning(f"Platform {platform} not supported")
             return []
     
-    def download_filtered_videos(self, video_urls, platform):
+    def download_filtered_videos(self, video_urls, platform, should_stop=None):
         """Download only the filtered videos"""
         if not video_urls:
             return False
@@ -216,6 +216,9 @@ class DeepfakeCollector:
         
         downloaded = 0
         for video in video_urls:
+            if should_stop is not None and should_stop():
+                logger.info("Stop requested — download loop aborted")
+                break
             url = video['url']
             try:
                 logger.info(f"Downloading: {video['title'][:50]}... ({video['duration']}s)")
@@ -228,13 +231,15 @@ class DeepfakeCollector:
         
         return downloaded > 0
     
-    def process_category(self, category_name, category_type):
-        """Process one category"""
+    def process_category(self, category_name, category_type, should_stop=None):
+        """Process one category. should_stop: optional callable returning True to abort early."""
         with self._collector_lock:
-            return self._process_category(category_name, category_type)
+            return self._process_category(category_name, category_type, should_stop)
 
-    def _process_category(self, category_name, category_type):
+    def _process_category(self, category_name, category_type, should_stop=None):
         # Check if we've reached target
+        if should_stop is not None and should_stop():
+            return
         target = self.config["TARGET_REAL"] if category_type == "real" else self.config["TARGET_FAKE"]
         current_count = len(self.progress.get(category_type, []))
         
@@ -275,7 +280,7 @@ class DeepfakeCollector:
         download_path = Path(self.config["PATHS"]["download"])
         download_path.mkdir(parents=True, exist_ok=True)
         existing_files = set(download_path.glob("*.mp4"))
-        downloaded = self.download_filtered_videos(filtered_videos, platform)
+        downloaded = self.download_filtered_videos(filtered_videos, platform, should_stop)
         
         if not downloaded:
             logger.warning(f"Failed to download videos for {category_name}")
@@ -289,6 +294,9 @@ class DeepfakeCollector:
         
         for video_path in video_files:
             try:
+                if should_stop is not None and should_stop():
+                    logger.info("Stop requested — processing loop aborted")
+                    break
                 logger.info(f"\n📹 Processing: {video_path.name}")
                 
                 # Run quality checks
